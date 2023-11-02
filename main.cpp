@@ -20,6 +20,7 @@ int	main(int ac, char **av)
 {
 	int							serverSockfd;    	// Server Socket fd
 	int							connectSockfd;    	// Connect Socket fd
+	int							kqfd;
 	std::string					errMsg = ""; 		// 에러메시지
 	SOCKADDR_IN					serverAddr;  		// 서버의 소켓 주소 저장
 	SOCKADDR_IN					clientAddr;  		// 클라이언트의 소켓 주소 저장
@@ -57,10 +58,12 @@ int	main(int ac, char **av)
 				}
 
 				//4. Listen
-				if (listen(serverSockfd, SOMAXCONN) < 0)
+				if (listen(serverSockfd, 3) < 0)
 				{
 					throw std::runtime_error(strerror(errno));
 				}
+
+				kqfd = kqueue();
 
 				//5. 클라이언트 소켓 요청 받기(Accept)
 				while (1)
