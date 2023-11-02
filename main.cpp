@@ -1,21 +1,35 @@
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/event.h>
 #include <cerrno>
 #include <cstring>
+#include <vector>
+
+typedef struct sockaddr_in	SOCKADDR_IN; 		// sockaddr_in 구조체 타입명 설정
+
+// void	client(int connectSockfd, SOCKADDR_IN clientAddr, std::vector<SOCKADDR_IN> clientList)
+// {
+// 	(void) clientList;
+// 	std::cout << "Client connected IP address = " \
+// 		<< inet_ntoa(clientAddr.sin_addr) << ":" << ntohs(clientAddr.sin_port) << std::endl;
+// }
 
 int	main(int ac, char **av)
 {
-	typedef struct sockaddr_in	SOCKADDR_IN; 		// sockaddr_in 구조체 타입명 설정
-	int							serverSockfd;    	// Socket fd
-	int							clientSockfd;    	// Socket fd
+	int							serverSockfd;    	// Server Socket fd
+	int							connectSockfd;    	// Connect Socket fd
 	std::string					errMsg = ""; 		// 에러메시지
 	SOCKADDR_IN					serverAddr;  		// 서버의 소켓 주소 저장
 	SOCKADDR_IN					clientAddr;  		// 클라이언트의 소켓 주소 저장
-	int							portNum;    // 포트번호 저장
+	// std::vector<SOCKADDR_IN>	*clientList;		// 클라이언트 소켓 주소들
+	int							portNum;   			// 포트번호 저장
+	socklen_t 					clientSize;			// 클라이언트 소켓 크기 저장
+	socklen_t 					compareSize;
+	ssize_t 					valread;
+	char						buffer[1024];
 
-	(void) clientSockfd;
-	(void) clientAddr;
 	try
 	{
 		if (ac >= 2)
@@ -37,7 +51,7 @@ int	main(int ac, char **av)
 				serverAddr.sin_port = portNum;
 
 				//3. Bind
-				if (bind(serverSockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0)
+				if (bind(serverSockfd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) //TODO - sockaddr. sockaddr_in 차이 정리
 				{
 					throw std::runtime_error(strerror(errno));
 				}
@@ -46,6 +60,29 @@ int	main(int ac, char **av)
 				if (listen(serverSockfd, SOMAXCONN) < 0)
 				{
 					throw std::runtime_error(strerror(errno));
+				}
+
+				//5. 클라이언트 소켓 요청 받기(Accept)
+				while (1)
+				{
+					clientSize = sizeof(SOCKADDR_IN);
+					compareSize = sizeof(SOCKADDR_IN);
+					std::cout << "clientSize: " << clientSize << std::endl;
+					std::cout << "compareSize: " << compareSize << std::endl;
+					if ((connectSockfd = accept(serverSockfd, (struct sockaddr*)&clientAddr, &clientSize)) < 0) //accept()가 이미 nonblocking이고 요청이 없으면 반복문 종료
+					{
+						std::cout << "strerror(errno)" << std::endl;
+						// throw std::runtime_error(strerror(errno));
+					}
+					//스레드 관리 kqueue에서 처리하기
+					//read, send()
+					if ((valread = recv(connectSockfd, buffer, sizeof(buffer), 0)) < 0)
+					{
+						std::cout << buffer << std::endl;
+					}
+					else
+						std::cout << "valread : " << valread << std::endl;
+						// throw std::runtime_error(strerror(errno));
 				}
 			}
 			catch(const std::exception& e)
