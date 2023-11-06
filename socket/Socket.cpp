@@ -1,30 +1,37 @@
 // Implementation of the Socket class.
 
-#include "Socket.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <string.h>
-
 #include <iostream>
 
+#include "Socket.h"
 #include "string.h"
 
-Socket::Socket() : m_sock(-1) { memset(&m_addr, 0, sizeof(m_addr)); }
+Socket::Socket() : m_sock(-1) 
+{ 
+  memset(&m_addr, 0, sizeof(m_addr)); 
+}
 
-Socket::~Socket() {
+Socket::~Socket() 
+{
   if (is_valid()) ::close(m_sock);
 }
 
-bool Socket::create() {
+bool Socket::create() 
+{
   m_sock = socket(AF_INET, SOCK_STREAM, 0);
 
-  if (!is_valid()) return false;
+  //debugging
+  std::cout << "create Socket : " << m_sock << std::endl;
+
+  if (!is_valid()) 
+    return false;
 
   // TIME_WAIT - argh
   int on = 1;
-  if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on,
-                 sizeof(on)) == -1)
+  if (setsockopt(m_sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&on, \
+        sizeof(on)) == -1)
     return false;
 
   return true;
@@ -67,6 +74,9 @@ bool Socket::accept(Socket& new_socket) const {
   new_socket.m_sock =
       ::accept(m_sock, (sockaddr*)&m_addr, (socklen_t*)&addr_length);
 
+  //debugging
+  std::cout << "accept newSocket : " << new_socket.m_sock << std::endl;
+
   if (new_socket.m_sock <= 0)
     return false;
   else
@@ -94,7 +104,7 @@ int Socket::recv(std::string& s) const {
   int status = ::recv(m_sock, buf, MAXRECV, 0);
 
   if (status == -1) {
-    std::cout << "status == -1   errno == " << errno << "  in Socket::recv\n";
+    std::cout << "status == -1   errno == " << errno << "  in Socket::recv" << std::endl;
     return 0;
   } else if (status == 0) {
     return 0;
@@ -105,14 +115,16 @@ int Socket::recv(std::string& s) const {
 }
 
 bool Socket::connect(const std::string host, const int port) {
-  if (!is_valid()) return false;
+  if (!is_valid()) 
+    return false;
 
   m_addr.sin_family = AF_INET;
   m_addr.sin_port = htons(port);
 
   int status = inet_pton(AF_INET, host.c_str(), &m_addr.sin_addr);
 
-  if (errno == EAFNOSUPPORT) return false;
+  if (errno == EAFNOSUPPORT) 
+    return false;
 
   status = ::connect(m_sock, (sockaddr*)&m_addr, sizeof(m_addr));
 

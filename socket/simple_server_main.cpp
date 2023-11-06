@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
       }
     }
   } catch (SocketException& e) {
-    std::cout << "Exception was caught:" << e.description() << "\nExiting.\n";
+    std::cout << "Exception was caught:" << e.description() << std::endl;
+    std::cout << "Exiting." << std::endl;
   }
 
   return 0;
