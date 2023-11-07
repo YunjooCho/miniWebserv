@@ -25,6 +25,10 @@ ServerSocket::ServerSocket ( int port )
         throw SocketException ( "Could not listen to socket." );
     }
 
+    if ( ! Socket::set_non_blocking() ) //! Set Non-blocking to server socket
+    {
+        throw SocketException ( "Could not set non-blocking to server socket." );
+    }
 }
 
 ServerSocket::~ServerSocket()
@@ -59,5 +63,21 @@ void ServerSocket::accept ( ServerSocket& sock )
     if ( ! Socket::accept ( sock ) )
     {
         throw SocketException ( "Could not accept socket." );
+    }
+}
+
+void ServerSocket::kqueue ( void )
+{
+    if ( ! Socket::kqueue() )
+    {
+        throw SocketException ( "Could not create kqueue." );
+    }
+}
+
+void ServerSocket::kevent ( const struct timespec *timeout )
+{
+    if ( ! Socket::kevent( timeout ) )
+    {
+        throw SocketException ( "Could not excute kevent()" );
     }
 }

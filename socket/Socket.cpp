@@ -4,9 +4,15 @@
 #include <fcntl.h>
 #include <string.h>
 #include <iostream>
+#include <sys/event.h>
+#include <sys/types.h>
+#include <sys/time.h>
+#include <map>
 
 #include "Socket.h"
 #include "string.h"
+
+
 
 Socket::Socket() : m_sock(-1) 
 { 
@@ -134,19 +140,46 @@ bool Socket::connect(const std::string host, const int port) {
     return false;
 }
 
-void Socket::set_non_blocking(const bool b) {
+bool Socket::set_non_blocking(void) {
   int opts;
 
-  opts = fcntl(m_sock, F_GETFL);
+  opts = fcntl(m_sock, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
 
   if (opts < 0) {
-    return;
+    return false;
   }
+  // if (b)
+  //   opts = (opts | O_NONBLOCK);
+  // else
+  //   opts = (opts & ~O_NONBLOCK);
 
-  if (b)
-    opts = (opts | O_NONBLOCK);
-  else
-    opts = (opts & ~O_NONBLOCK);
+  // fcntl(m_sock, F_SETFL, opts);
+  return true;
+}
 
-  fcntl(m_sock, F_SETFL, opts);
+bool Socket::kqueue(void) {
+
+  kqfd = kqueue();
+
+  if (kqfd == -1) {
+    return false;
+  }
+  return true;
+}
+
+void Socket::change_events( uintptr_t ident, int16_t filter, \
+        uint16_t flags, uint32_t fflags, intptr_t data, void *udata )
+{
+  struct kevent temp_event;
+
+  EV_SET(&temp_event, ident, filter, flags, fflags, data, udata);
+  change_list.push_back(temp_event);
+}
+
+bool Socket::kevent( timespec *timeout )
+{
+  new_events = kevent(kqfd, &change_list[0], change_list.size(), event_list, 8, NULL);
+  if (new_events == -1)
+    return false;
+  return (true);
 }

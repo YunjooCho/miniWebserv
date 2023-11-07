@@ -14,42 +14,48 @@
 #include <unistd.h>
 #include <string>
 #include <arpa/inet.h>
-
+#include <vector>
 
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 100;
 const int MAXRECV = 1000;
 
+static int                        kqfd;
+static int                        new_events;
+static std::vector<struct kevent> change_list;
+struct kevent*                    curr_event;
+struct kevent                     event_list[8];
+
+
 class Socket
 {
-public:
-    Socket();
-    virtual ~Socket();
+    public:
+        Socket();
+        virtual ~Socket();
 
-    // Server initialization
-    bool create();
-    bool bind ( const int port );
-    bool listen() const;
-    bool accept ( Socket& ) const;
+        // Server initialization
+        bool    create();
+        bool    bind ( const int port );
+        bool    listen() const;
+        bool    accept ( Socket& ) const;
+        bool    set_non_blocking ( void );
 
-    // Client initialization
-    bool connect ( const std::string host, const int port );
+        // Client initialization
+        bool    connect ( const std::string host, const int port );
 
-    // Data Transimission
-    bool send ( const std::string ) const;
-    int recv ( std::string& ) const;
+        // Kqueue initialization
+        bool    kqueue(void);
 
-
-    void set_non_blocking ( const bool );
-
-    bool is_valid() const { return m_sock != -1; }
-
-private:
-
-    int m_sock;
-    sockaddr_in m_addr;
+        // Data Transimission
+        bool    send ( const std::string ) const;
+        int     recv ( std::string& ) const;
 
 
+        bool    is_valid( void ) const { return m_sock != -1; }
+
+    private:
+        int m_sock;
+        sockaddr_in m_addr;
 };
 
 
