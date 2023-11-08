@@ -176,9 +176,9 @@ void Socket::change_events( uintptr_t ident, int16_t filter, \
   change_list.push_back(temp_event);
 }
 
-bool Socket::kevent( timespec *timeout )
+bool Socket::kevent( const struct timespec *timeout )
 {
-  new_events = kevent(kqfd, &change_list[0], change_list.size(), event_list, 8, NULL);
+  new_events = ::kevent(kqfd, &change_list[0], change_list.size(), event_list, 8, timeout);
   if (new_events == -1)
     return false;
   return (true);

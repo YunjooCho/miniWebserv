@@ -12,11 +12,11 @@ int main(int argc, char** argv) {
     ServerSocket server(30000);
 
     kqueue(); //! 서버 클래스, 소켓 클래스 수정
-    change_events(server, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+    server.change_events(server, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
     while (true) {
-      kevent(NULL);
+      server.kevent(NULL);
       change_list.clear();
-      for (size_t i = 0; i < new_events) //TODO
+      // for (size_t i = 0; i < new_events) //TODO
       ServerSocket new_sock;
 
       server.accept(new_sock);

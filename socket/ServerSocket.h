@@ -7,7 +7,7 @@
 
 #include "Socket.h"
 
-class ServerSocket : private Socket
+class ServerSocket : protected Socket
 {
     public:
         ServerSocket ( int port );
@@ -19,6 +19,7 @@ class ServerSocket : private Socket
 
         void accept ( ServerSocket& );
         void kqueue ( void );
+        void kevent ( const struct timespec *timeout );
     private:
         std::map<int, std::string> m_clients;
 
