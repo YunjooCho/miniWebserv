@@ -9,7 +9,7 @@
 #include "Socket.h"
 
 
-class ClientSocket : protected Socket
+class ClientSocket : public Socket
 {
  public:
 

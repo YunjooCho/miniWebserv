@@ -66,18 +66,7 @@ void ServerSocket::accept ( ServerSocket& sock )
     }
 }
 
-void ServerSocket::kqueue ( void )
+void ServerSocket::deleteClient(int clientFd)
 {
-    if ( ! Socket::kqueue() )
-    {
-        throw SocketException ( "Could not create kqueue." );
-    }
-}
-
-void ServerSocket::kevent ( const struct timespec *timeout )
-{
-    if ( ! Socket::kevent( timeout ) )
-    {
-        throw SocketException ( "Could not excute kevent()" );
-    }
+	m_clients.erase(clientFd);
 }

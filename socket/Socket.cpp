@@ -157,29 +157,12 @@ bool Socket::set_non_blocking(void) {
   return true;
 }
 
-bool Socket::kqueue(void) {
-
-  kqfd = kqueue();
-
-  if (kqfd == -1) {
-    return false;
-  }
-  return true;
+const int& Socket::getSocketFd(void)
+{
+  return (m_sock);
 }
 
-void Socket::change_events( uintptr_t ident, int16_t filter, \
-        uint16_t flags, uint32_t fflags, intptr_t data, void *udata )
+const sockaddr_in& Socket::getSockAddr(void)
 {
-  struct kevent temp_event;
-
-  EV_SET(&temp_event, ident, filter, flags, fflags, data, udata);
-  change_list.push_back(temp_event);
-}
-
-bool Socket::kevent( const struct timespec *timeout )
-{
-  new_events = ::kevent(kqfd, &change_list[0], change_list.size(), event_list, 8, timeout);
-  if (new_events == -1)
-    return false;
-  return (true);
+  return (m_addr);
 }
