@@ -20,43 +20,33 @@ const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 100;
 const int MAXRECV = 1000;
 
-// static int                        kqfd;
-// static int                        new_events;
-// static std::vector<struct kevent> change_list;
-// struct kevent*                    curr_event;
-// struct kevent                     event_list[8];
-
-
 class Socket
 {
-    public:
-        Socket();
-        virtual ~Socket();
+	public:
+		Socket();
+		virtual ~Socket();
 
-        // Server initialization
-        bool    create();
-        bool    bind ( const int port );
-        bool    listen() const;
-        bool    accept ( Socket& ) const;
-        bool    set_non_blocking ( void );
-        // void    change_events( uintptr_t ident, int16_t filter, \
-        //             uint16_t flags, uint32_t fflags, intptr_t data, void *udata );
-        // bool    kevent( const struct timespec *timeout );
+		// Server initialization
+		bool    create();
+		bool    bind ( const int port );
+		bool    listen() const;
+		bool    accept ( Socket& ) const;
+		bool    set_non_blocking ( void );
 
-        // Client initialization
-        bool    connect ( const std::string host, const int port );
+		// Client initialization
+		bool    connect ( const std::string host, const int port );
 
-        // Data Transimission
-        bool    send ( const std::string ) const;
-        int     recv ( std::string& ) const;
+		// Data Transimission
+		bool    send ( const std::string ) const;
+		int     recv ( std::string& ) const;
 
-        bool    is_valid( void ) const { return m_sock != -1; }
+		bool    is_valid( void ) const { return m_sock != -1; }
 
-        const int&          getSocketFd(void);
-        const sockaddr_in&  getSockAddr(void);
-    protected:
-        int         m_sock;
-        sockaddr_in m_addr;
+		const int&          getSocketFd(void);
+		const sockaddr_in&  getSockAddr(void);
+	protected:
+		int         m_sock;
+		sockaddr_in m_addr;
 };
 
 
