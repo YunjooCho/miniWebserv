@@ -66,7 +66,36 @@ void ServerSocket::accept ( ServerSocket& sock )
     }
 }
 
-void ServerSocket::deleteClient(int clientFd)
+void ServerSocket::deleteClient(const int& clientFd)
 {
+    close(clientFd);
 	m_clients.erase(clientFd);
+}
+
+void ServerSocket::setClientDate(const int& clientFd, \
+    const std::string& data)
+{
+    m_clients[clientFd] += data;
+}
+
+bool ServerSocket::findClient(const int& clientFd)
+{
+	if (m_clients.find(clientFd)!= m_clients.end())
+		return (true);
+	return (false);
+}
+
+void	ServerSocket::handleWriteEvent(const int& clientFd)
+{
+	std::map<int, std::string>::iterator iter = m_clients.find(clientFd);
+
+	if (iter != m_clients.end() && m_clients[clientFd] != "")
+	{
+		if (write(clientFd, m_clients[clientFd].c_str(), m_clients[clientFd].size()) == -1)
+		{
+			std::cerr << "Client Write Error!" << std::endl;
+		}
+		else
+			m_clients[clientFd].clear();
+	}
 }

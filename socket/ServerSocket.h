@@ -11,18 +11,21 @@
 
 class ServerSocket : public Socket
 {
-    public:
-        ServerSocket( int port );
-        ServerSocket(){};
-        virtual ~ServerSocket();
+	public:
+		ServerSocket( int port );
+		ServerSocket(){};
+		virtual ~ServerSocket();
 
-        const ServerSocket& operator << ( const std::string& ) const;
-        const ServerSocket& operator >> ( std::string& ) const;
+		const ServerSocket& operator << ( const std::string& ) const;
+		const ServerSocket& operator >> ( std::string& ) const;
 
-        void	accept(ServerSocket&);
-        void	deleteClient(int clientFd);
-    private:
-        std::map<int, std::string> m_clients;
+		void	accept(ServerSocket&);
+		void	setClientDate(const int& clientFd, const std::string& data);
+		bool	findClient(const int& clientFd);
+		void	deleteClient(const int& clientFd);
+		void	handleWriteEvent(const int& clientFd);
+	private:
+		std::map<int, std::string> m_clients;
 
 };
 

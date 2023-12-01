@@ -42,8 +42,8 @@ class Socket
 
 		bool    is_valid( void ) const { return m_sock != -1; }
 
-		const int&          getSocketFd(void);
-		const sockaddr_in&  getSockAddr(void);
+		const int&									getSocketFd(void);
+		const sockaddr_in&	getSockAddr(void);
 	protected:
 		int         m_sock;
 		sockaddr_in m_addr;
