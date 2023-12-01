@@ -93,7 +93,6 @@ int main(int argc, char** argv) {
             {
               buf[n] = '\0';
               server.setClientDate(connect_socket.getSocketFd(), buf);
-			  std::cout << std::string(buf) << std::endl; 
             }
           }
         } else if (curr_event->filter ==
